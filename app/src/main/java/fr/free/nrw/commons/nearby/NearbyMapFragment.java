@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,6 +99,22 @@ public class NearbyMapFragment extends android.support.v4.app.Fragment {
             });
 
             addCurrentLocationMarker(mapboxMap);
+
+            mapboxMap.setOnMapLongClickListener(new MapboxMap.OnMapLongClickListener() {
+                @Override
+                public void onMapLongClick(@NonNull LatLng point) {
+                    mapboxMap.clear();
+                    fr.free.nrw.commons.location.LatLng locationLatLng = new fr.free.nrw.commons.location.LatLng(
+                            point.getLatitude(),
+                            point.getLongitude(),
+                            0
+                    );
+                    MarkerOptions longClickedMarker = new MarkerOptions()
+                            .position(point);
+                    mapboxMap.addMarker(longClickedMarker);
+                    ((NearbyActivity) getActivity()).refreshSelectedLocationView(locationLatLng);
+                }
+            });
         });
         if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("theme",false)) {
             mapView.setStyleUrl(getResources().getString(R.string.map_theme_dark));
